@@ -243,7 +243,9 @@ function handleImports(
   // Relevant specification:
   //   - CSS Import Resolve: https://csstools.github.io/css-import-resolve/
 
-  if (!input.includes('@import')) return [input, []]
+  if (!input.includes('@import')) {
+    return [input, [file]]
+  }
 
   return postcss()
     .use(atImport())
@@ -253,6 +255,8 @@ function handleImports(
 
       // Use `result.messages` to get the imported files. This also includes the
       // current file itself.
-      result.messages.filter((msg) => msg.type === 'postcss-import').map((msg) => msg.file),
+      [file].concat(
+        result.messages.filter((msg) => msg.type === 'dependency').map((msg) => msg.file),
+      ),
     ])
 }
